@@ -17,7 +17,7 @@ let userData = {
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
   email: faker.internet.email(),
-  password: faker.internet.password()
+  password: faker.internet.password() + faker.datatype.number()
 };
 
 
@@ -27,28 +27,30 @@ describe('Create an account', () => {
     // so we must tell it to visit our website with the `cy.visit()` command.
     // Since we want to visit the same URL at the start of all our tests,
     // we include it in our beforeEach function so that it runs before each test
-    cy.visit('https://preprod.backmarket.fr/register')
+    cy.visit('/register')
+    cy.contains('C\'est OK pour moi').click()
   })
 
   it('refuse cookies then create a new working user', () => {
-    cy.get('._2GKLH9j3Pa1wGMII3Gp4aI button').should('have.class', '_3VT0k4UG')
-    cy.get('._2GKLH9j3Pa1wGMII3Gp4aI button').should('have.class', '_3nh67M3k')
-    cy.get('._2GKLH9j3Pa1wGMII3Gp4aI ._3VT0k4UG').click()
-
     cy.get('#firstName').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.firstName).should('have.value', userData.firstName)
     cy.get('#lastName').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.lastName).should('have.value', userData.lastName)
     cy.get('#signup-email').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.email).should('have.value', userData.email)
     cy.get('#signup-password').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.password)
-    cy.contains('Enchantés').click()
-    cy.get('[data-test="input-password"] p').should('not.have.css','color', 'rgb(169, 15, 20)')
+    cy.get('button[data-qa="signup-submit-button"]').should('include.text','Enchantés').click()
+    //cy.get('[data-test="input-password"] p').should('not.have.css','color', 'rgb(169, 15, 20)')
+
+    cy.get('button[aria-label="Sous-menu utilisateur"]').click()
+    cy.get('header a[href="/dashboard/profile"]').should('include.text', 'Mon Compte').click()
+
+    cy.get('div[data-test="myprofile-profile-user-info"] span').should('include.text', userData.firstName + userData.lastName)
+    //cy.get('div[data-test="myprofile-profile-user-info"]').should('include.text', userData.lastName)
+    cy.get('div[data-test="myprofile-profile-user-info"]').should('include.text', userData.email.toLocaleLowerCase())
+
 
   })
 
-  it('Invalid password and first name', () => {
-    cy.get('._2GKLH9j3Pa1wGMII3Gp4aI button').should('have.class', '_3VT0k4UG')
-    cy.get('._2GKLH9j3Pa1wGMII3Gp4aI button').should('have.class', '_3nh67M3k')
-    cy.get('._2GKLH9j3Pa1wGMII3Gp4aI ._3VT0k4UG').click()
 
+  it('Invalid password and first name', () => {
     //cy.get('#firstName').type(userData.firstName).should('have.value', userData.firstName)
     cy.get('#lastName').type(userData.lastName).should('have.value', userData.lastName)
     cy.get('#signup-email').type(userData.email).should('have.value', userData.email)
