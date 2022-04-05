@@ -31,11 +31,11 @@ describe('Create an account', () => {
     cy.contains('C\'est OK pour moi').click()
   })
 
-  it('refuse cookies then create a new working user', () => {
-    cy.get('#firstName').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.firstName).should('have.value', userData.firstName)
-    cy.get('#lastName').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.lastName).should('have.value', userData.lastName)
-    cy.get('#signup-email').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.email).should('have.value', userData.email)
-    cy.get('#signup-password').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.password)
+  it('create a new working user', () => {
+    cy.get('[data-test="signup-component"] #firstName').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.firstName).should('have.value', userData.firstName)
+    cy.get('[data-test="signup-component"] #lastName').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.lastName).should('have.value', userData.lastName)
+    cy.get('[data-test="signup-component"] #signup-email').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.email).should('have.value', userData.email)
+    cy.get('[data-test="signup-component"] #signup-password').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.password)
     cy.get('button[data-qa="signup-submit-button"]').should('include.text','Enchantés').click()
     //cy.get('[data-test="input-password"] p').should('not.have.css','color', 'rgb(169, 15, 20)')
 
@@ -45,19 +45,30 @@ describe('Create an account', () => {
     cy.get('div[data-test="myprofile-profile-user-info"] span').should('include.text', userData.firstName + userData.lastName)
     //cy.get('div[data-test="myprofile-profile-user-info"]').should('include.text', userData.lastName)
     cy.get('div[data-test="myprofile-profile-user-info"]').should('include.text', userData.email.toLocaleLowerCase())
-
-
   })
-
 
   it('Invalid password and first name', () => {
     //cy.get('#firstName').type(userData.firstName).should('have.value', userData.firstName)
-    cy.get('#lastName').type(userData.lastName).should('have.value', userData.lastName)
-    cy.get('#signup-email').type(userData.email).should('have.value', userData.email)
-    cy.get('#signup-password').type("1234")
+    cy.get('[data-test="signup-component"] #lastName').type(userData.lastName).should('have.value', userData.lastName)
+    cy.get('[data-test="signup-component"] #signup-email').type(userData.email).should('have.value', userData.email)
+    cy.get('[data-test="signup-component"] #signup-password').type("1234")
     cy.contains('Enchantés').click()
     //cy.get('[data-test="input-password"] p').should('include.text', 'Au moins 8 caractères, dont 1 majuscule, 1 minuscule et 1 chiffre. Parce qu\'on sait jamais.')
     cy.get('[data-test="input-password"] p').should('have.css','color', 'rgb(169, 15, 20)')
     cy.get('#firstName').should('have.css','border-color', 'rgb(169, 15, 20)')
   })
+
+  it('login with the created user', () => {
+    cy.get('[data-test="signin-component"] #signin-email').type(userData.email).should('have.value', userData.email)
+    cy.get('[data-test="input-password"] #signin-password').type(userData.password)
+    cy.get('button[data-qa="signin-submit-button"]').should('include.text','Welcome Back!').click()
+
+    cy.get('[data-test="dashboard-navigation-profil"]').click()
+
+    cy.get('div[data-test="myprofile-profile-user-info"] span').should('include.text', userData.firstName + userData.lastName)
+    cy.get('div[data-test="myprofile-profile-user-info"]').should('include.text', userData.email.toLocaleLowerCase())
+
+
+  })
+
 })
