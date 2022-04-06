@@ -34,7 +34,7 @@ describe('Create an account', () => {
     cy.url().should('include', 'profile')
   })
 
-  it('Invalid password and first name', () => {
+  it.only('Invalid password and first name', () => {
 
     cy.get('[data-test="signup-component"] #lastName').type(userData.lastName).should('have.value', userData.lastName)
     cy.get('[data-test="signup-component"] #signup-email').type(userData.email).should('have.value', userData.email)
@@ -43,9 +43,9 @@ describe('Create an account', () => {
 
     cy.contains('Enchantés').click()
 
-    cy.get('[data-test="input-password"] p').should('have.css','color', 'rgb(169, 15, 20)').and('be.visible')
+    cy.get('[data-test="input-password"]').find('#signup-password').should('have.class','border-danger').and('be.visible')
     cy.contains('Le champ "Prénom" est obligatoire ').should('be.visible')
-    cy.get('#firstName').should('have.css','border-color', 'rgb(169, 15, 20)').and('be.visible')
+    cy.get('#firstName').should('have.class','border-danger').and('be.visible')
 
     cy.url().should('include', 'register')
   })
@@ -70,7 +70,7 @@ describe('Create an account', () => {
     cy.get('[data-test="input-password"]').find('#signin-password').should('be.visible').type('1234')
 
     cy.get('button[data-qa="signin-submit-button"]').should('include.text','Welcome Back!').and('be.visible').click()
-    cy.get('[data-test="signin-component"]').find('#signin-email').should('have.css','border-color', 'rgb(169, 15, 20)')
+    cy.get('[data-test="signin-component"]').find('#signin-email').should('have.class','border-danger')
 
     cy.url().should('include', 'register')
   })
@@ -81,7 +81,7 @@ describe('Create an account', () => {
     cy.get('[data-test="input-password"]').find('#signin-password').should('be.visible')
 
     cy.get('button[data-qa="signin-submit-button"]').should('include.text','Welcome Back!').and('be.visible').click()
-    cy.get('[data-test="input-password"]').find('#signin-password').should('have.css','border-color', 'rgb(169, 15, 20)')
+    cy.get('[data-test="input-password"]').find('#signin-password').should('have.class','border-danger')
 
     cy.contains(' Le champ mot de passe est obligatoire ').should('be.visible')
 
