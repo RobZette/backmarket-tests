@@ -16,12 +16,12 @@ describe('Create an account', () => {
     cy.contains('C\'est OK pour moi').click()
   })
 
-  it.only('create a new working user', () => {
-    cy.get('[data-test="signup-component"] #firstName').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.firstName).should('have.value', userData.firstName)
-    cy.get('[data-test="signup-component"] #lastName').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.lastName).should('have.value', userData.lastName)
-    cy.get('[data-test="signup-component"] #signup-email').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.email).should('have.value', userData.email)
+  it('create a new working user', () => {
+    cy.get('[data-test="signup-component"] #firstName').type(userData.firstName).should('have.value', userData.firstName)
+    cy.get('[data-test="signup-component"] #lastName').type(userData.lastName).should('have.value', userData.lastName)
+    cy.get('[data-test="signup-component"] #signup-email').type(userData.email).should('have.value', userData.email)
     cy.contains('Au moins 8 caractères, dont 1 majuscule, 1 minuscule et 1 chiffre. Parce qu\'on sait jamais.').should('be.visible')
-    cy.get('[data-test="signup-component"] #signup-password').should('not.have.css','border-color', 'rgb(169, 15, 20)').type(userData.password)
+    cy.get('[data-test="signup-component"] #signup-password').type(userData.password).should('have.value', userData.password)
     cy.get('button[data-qa="signup-submit-button"]').should('include.text','Enchantés').click()
 
     cy.url().should('include', 'dashboard')
@@ -62,6 +62,44 @@ describe('Create an account', () => {
     cy.get('div[data-test="myprofile-profile-user-info"]').should('include.text', userData.email.toLocaleLowerCase()).and('be.visible')
 
     cy.url().should('include', 'profile')
+  })
+
+  it('login with incorrect e-mail', () => {
+
+    cy.get('[data-test="signin-component"]').find('#signin-email').should('be.visible').type('ee')
+    cy.get('[data-test="input-password"]').find('#signin-password').should('be.visible').type('1234')
+
+    cy.get('button[data-qa="signin-submit-button"]').should('include.text','Welcome Back!').and('be.visible').click()
+    cy.get('[data-test="signin-component"]').find('#signin-email').should('have.css','border-color', 'rgb(169, 15, 20)')
+
+    cy.url().should('include', 'register')
+  })
+
+  it('login with correct e-mail and no password', () => {
+
+    cy.get('[data-test="signin-component"]').find('#signin-email').should('be.visible').type('ee@e.e')
+    cy.get('[data-test="input-password"]').find('#signin-password').should('be.visible')
+
+    cy.get('button[data-qa="signin-submit-button"]').should('include.text','Welcome Back!').and('be.visible').click()
+    cy.get('[data-test="input-password"]').find('#signin-password').should('have.css','border-color', 'rgb(169, 15, 20)')
+
+    cy.contains(' Le champ mot de passe est obligatoire ').should('be.visible')
+
+
+    cy.url().should('include', 'register')
+  })
+
+  it('login with unknown email and password', () => {
+
+    cy.get('[data-test="signin-component"]').find('#signin-email').should('be.visible').type('ee@e.e')
+    cy.get('[data-test="input-password"]').find('#signin-password').should('be.visible').type('1234')
+
+    cy.get('button[data-qa="signin-submit-button"]').should('include.text','Welcome Back!').and('be.visible').click()
+
+    //cy.contains('Informations d\'identification erronées').should('be.visible')
+    cy.contains('Informations d\'identification erronées').should('be.visible')
+    
+    cy.url().should('include', 'register')
   })
 
 })
